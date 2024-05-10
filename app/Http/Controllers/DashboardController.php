@@ -19,7 +19,7 @@ class DashboardController extends Controller
         // Access user information
         $userName = $user->name;
         // Access user roles
-        $userRoles = $user->role->first()->name;
+        $userRoles = $user->role->first()->title;
 
         return view('dashboard', [
             'user' => $user,

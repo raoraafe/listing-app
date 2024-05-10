@@ -3,6 +3,8 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Requests\UserRequest;
+use App\Models\User;
+use App\Models\UserRole;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 use Backpack\CRUD\app\Http\Controllers\Operations\CreateOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\DeleteOperation;
@@ -32,7 +34,7 @@ class UserCrudController extends CrudController
      */
     public function setup(): void
     {
-        CRUD::setModel(\App\Models\User::class);
+        CRUD::setModel(User::class);
         CRUD::setRoute(config('backpack.base.route_prefix') . '/user');
         CRUD::setEntityNameStrings('user', 'users');
     }
@@ -47,6 +49,14 @@ class UserCrudController extends CrudController
     {
         CRUD::column('name');
         CRUD::column('email');
+
+        CRUD::addColumn([
+            'label'     => 'Role',
+            'type'      => 'select',
+            'name'      => 'userRole', // Change this to the actual relationship method in your User model
+            'entity'    => 'userRole', // Change this to the name of the relationship method in your User model
+            'attribute' => 'title', //
+        ]);
 
         /**
          * Columns can be defined using the fluent syntax or array syntax:
@@ -67,6 +77,26 @@ class UserCrudController extends CrudController
 
         CRUD::field('name');
         CRUD::field('email');
+
+        $defaultRoles = UserRole::all()->pluck('title', 'id')->toArray();
+
+        if (CRUD::getCurrentEntryId() !== null) {
+
+            $selectedRole = User::find(CRUD::getCurrentEntryId())->userRole->pluck('title', 'id')->toArray();
+        }
+
+        CRUD::addField([
+            'label'     => 'Role',
+            'type'      => 'select',
+            'name'      => 'userRole', // Change this to the actual relationship method in your User model
+            'entity'    => 'userRole', // Change this to the name of the relationship method in your User model
+            'attribute' => 'title', // Change this to the attribute you want to display from the Role model
+            'model'     => UserRole::class, // Change this to the namespace of your Role model
+            'pivot'     => true, // Set this to true if your relationship uses a pivot table
+            'default'   => key($selectedRole),
+            'options'   => $defaultRoles,
+        ]);
+
         CRUD::field('password');
 
         /**
