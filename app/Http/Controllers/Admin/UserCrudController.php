@@ -13,6 +13,7 @@ use Backpack\CRUD\app\Http\Controllers\Operations\ShowOperation;
 use Backpack\CRUD\app\Http\Controllers\Operations\UpdateOperation;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanel;
 use Backpack\CRUD\app\Library\CrudPanel\CrudPanelFacade as CRUD;
+use Illuminate\Support\Facades\Log;
 
 /**
  * Class UserCrudController
@@ -78,11 +79,10 @@ class UserCrudController extends CrudController
         CRUD::field('name');
         CRUD::field('email');
 
-        $defaultRoles = UserRole::all()->pluck('title', 'id')->toArray();
-
+        $selectedRole = null;
         if (CRUD::getCurrentEntryId() !== null) {
-
-            $selectedRole = User::find(CRUD::getCurrentEntryId())->userRole->pluck('title', 'id')->toArray();
+            // Get selected role by current user id.
+            $selectedRole = User::find(CRUD::getCurrentEntryId())->userRole->pluck('id')->first();
         }
 
         CRUD::addField([
@@ -91,10 +91,13 @@ class UserCrudController extends CrudController
             'name'      => 'userRole', // Change this to the actual relationship method in your User model
             'entity'    => 'userRole', // Change this to the name of the relationship method in your User model
             'attribute' => 'title', // Change this to the attribute you want to display from the Role model
-            'model'     => UserRole::class, // Change this to the namespace of your Role model
+            'model'     => 'App\Models\UserRole', // Change this to the namespace of your Role model
             'pivot'     => true, // Set this to true if your relationship uses a pivot table
-            'default'   => key($selectedRole),
-            'options'   => $defaultRoles,
+            'value'   => $selectedRole, // For default, used value and assign role id of current user.
+            'options'   => (function ($query) {
+                // Return UserRole model object with data.
+                return $query->orderBy('title', 'ASC')->get();
+            })
         ]);
 
         CRUD::field('password');

@@ -2,7 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\Role;
+use App\Models\UserRole;
 use Illuminate\Database\Seeder;
 use Illuminate\Support\Facades\DB;
 
@@ -18,19 +18,19 @@ class UserRoleSeeder extends Seeder
         // Insert default user roles
         DB::table('user_roles')->insert([
             [
-                'name' => Role::ROLE_CUSTOMER,
+                'name' => UserRole::ROLE_CUSTOMER,
                 'title' => 'Customer',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
-                'name'       => Role::ROLE_INSURANCE_PROVIDER,
+                'name'       => UserRole::ROLE_INSURANCE_PROVIDER,
                 'title'      => 'Insurance Provider',
                 'created_at' => now(),
                 'updated_at' => now()
             ],
             [
-                'name' => Role::ROLE_ADMIN,
+                'name' => UserRole::ROLE_ADMIN,
                 'title' => 'Admin',
                 'created_at' => now(),
                 'updated_at' => now()
